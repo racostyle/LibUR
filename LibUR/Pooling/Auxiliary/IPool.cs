@@ -4,7 +4,8 @@ namespace LibUR.Pooling.Auxiliary
 { 
     public interface IPool<T>
     {
-        PooledObject<T> ActivatePooledObject(Vector3 position);
-        PooledObject<T>[] GetPool();
+        IPooledObject<T> ActivateObject(Vector3 position);
+        IPooledObject<T>[] GetPool();
+        void Dispose();
     }
 }
