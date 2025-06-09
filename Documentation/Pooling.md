@@ -48,20 +48,7 @@ var poolData = builder.Build();
 
 ---
 
-### **3. PooledObject<T>**
-
-> _Located in `PooledObject.cs`_
-
-Represents a pooled object containing:
-
-- **Script** — The component (`T`) attached to the GameObject.
-- **GameObject** — The associated `GameObject`.
-- **Transform** — Cached `Transform`.
-- **Behaviour** — Cached `Behaviour` component (if any).
-
----
-
-### **4. IPool<T>**
+### **3. IPool<T>**
 
 > _Located in `IPool.cs`_
 
@@ -109,9 +96,9 @@ Processes objects **in randomized order** by shuffling before enqueueing.
 
 ## **Pool Types**
 
-### **APoolFixed<T>**
+### **PoolFixed<T>**
 
-> _Located in `APoolFixed.cs`_
+> _Located in `PoolFixed.cs`_
 
 Fixed-size single object pool.
 
@@ -123,7 +110,7 @@ Fixed-size single object pool.
 
 ### **APoolFixed_MultipleObjects<T>**
 
-> _Located in `APoolFixed_MultipleObjects.cs`_
+> _Located in `PoolFixed_MO.cs`_
 
 Fixed-size pool supporting **multiple types** of objects.
 
@@ -132,9 +119,9 @@ Fixed-size pool supporting **multiple types** of objects.
 
 ---
 
-### **APoolFlexible<T>**
+### **PoolFlexible<T>**
 
-> _Located in `APoolFlexible.cs`_
+> _Located in `PoolFlexible.cs`_
 
 Flexible-size pool that grows when empty.
 
@@ -149,7 +136,7 @@ Flexible-size pool that grows when empty.
    - Create a **PoolCreationData** using the builder.
    - Define object initialization (`WireInitialize`) and reactivation (`WireEnable`) behaviors.
 2. **Initialization**
-   - Instantiate and initialize the pool using one of the `APool*` base classes.
+   - Instantiate and initialize the pool using one of the `Pool*` base classes.
 3. **Usage**
    - Call `ActivatePooledObject(Vector3 position)` to retrieve an object from the pool.
    - Object will be positioned, activated, and ready for use.
@@ -162,17 +149,24 @@ Flexible-size pool that grows when empty.
 ## **Example Usage**
 
 ```csharp
-public class MyBulletPool : APoolFlexible<Bullet>
+public class BulletPool : MonoBehaviour
 {
-    void Awake()
-    {
-        var builder = new PoolCreationDataBuilder<Bullet>("bulletPool")
-            .SetSize(20)
-            .SetIncrement(10)
-            .WireInitialize(bullet => bullet.Setup())
-            .WireEnable(bullet => bullet.OnReuse());
+    [SerializeField] GameObject ObjectRef;
+    private PoolingInfo _poolingInfo;
+    private IPool<Bullet> _pool;
 
-        Initialize(builder.Build(), new QueueOrdered());
+    // Start is called before the first frame update
+    void Start()
+    {
+        _poolingInfo = GetComponent<Bullet>();
+        var creationData = new PoolCreationDataBuilder<Bullet>("Bullets")
+            .SetSize(_poolingInfo.Size)
+            .SetIncrement(_poolingInfo.Increment)
+            .WireInitialize((Bullet bullet) => sphere.Init("this is fired only on creation"))
+            .WireEnable((Bullet bullet) => sphere.Reset("this is fired whenever object is enabled"))
+            .Build();
+
+        _pool = new PoolFlexible<Bullet>(in creationData, new QueueOrdered(), ObjectRef);
     }
 }
 ```
@@ -187,7 +181,6 @@ var bullet = myBulletPool.ActivatePooledObject(spawnPosition);
 
 # **Notes**
 
-- Always call `Dispose()` when destroying the pool manually to clean up instantiated objects.
 - `PopulateQueue()` is used internally to refill the pool if inactive objects are available.
 - Be mindful of setting the correct `ObjectRef` or `ObjectRefs[]` array in the Unity Inspector.
-- For `APoolFixed_MultipleObjects`, ensure the **length of ObjectRef[] matches ObjectDistribution[]**.
+- For `PoolFixed_MO`, ensure the **length of ObjectRef[] matches ObjectDistribution[]**.
