@@ -5,14 +5,14 @@ using UnityEngine;
 
 namespace LibUR.Pooling
 {
-    public class PoolFlexible<T> : IPool<T>
+    public class PoolFlexible<T> : IPool<T> where T : MonoBehaviour
     {
         private readonly GameObject _references;
         private readonly GameObject _container;
         private PoolCreationData<T> _data;
         private int _maxPoolSize;
 
-        private IPooledObject<T>[] _pool;
+        private T[] _pool;
         private IQueue _queue;
 
         public PoolFlexible (in PoolCreationData<T> data, IQueue queue, GameObject references)
@@ -21,7 +21,7 @@ namespace LibUR.Pooling
             _queue = queue;
             _references = references;
             _maxPoolSize = data.Size;
-            _pool = new IPooledObject<T>[_data.Size];
+            _pool = new T[_data.Size];
 
             _container = CreateLocalContainer(data.PoolName, data.ParentContainer);
             PopulatePool(0, data.Size);
@@ -40,14 +40,14 @@ namespace LibUR.Pooling
             for (int i = start; i < size; i++)
             {
                 var obj = UnityEngine.GameObject.Instantiate(_references, Vector3.zero, Quaternion.identity, _container.transform);
-                if (!obj.TryGetComponent<IPooledObject<T>>(out var component))
+                if (!obj.TryGetComponent<T>(out var component))
                 {
                     Debug.Log($"{component} could not be found!");
                     continue;
                 }
 
                 _pool[i] = component;
-                _data.InitializeAction?.Invoke(_pool[i].Script);
+                _data.InitializeAction?.Invoke(_pool[i]);
                 obj.SetActive(false);
                 _queue.AddToQueue(i);
             }
@@ -58,13 +58,13 @@ namespace LibUR.Pooling
         {
             for (int i = 0; i < _pool.Length; i++)
             {
-                if (!_pool[i].GameObject.activeInHierarchy)
+                if (!_pool[i].gameObject.activeInHierarchy)
                     _queue.AddToQueue(i);
             }
             _queue.RebuildQueue();
         }
 
-        public IPooledObject<T> ActivateObject(Vector3 position)
+        public T ActivateObject(Vector3 position)
         {
             if (_queue.Count == 0)
             {
@@ -80,13 +80,13 @@ namespace LibUR.Pooling
 
             int index = _queue.Dequeue();
 
-            _pool[index].GameObject.SetActive(true);
-            _pool[index].Transform.position = position;
-            _data.EnableAction?.Invoke(_pool[index].Script);
+            _pool[index].gameObject.SetActive(true);
+            _pool[index].transform.position = position;
+            _data.EnableAction?.Invoke(_pool[index]);
             return _pool[index];
         }
 
-        public IPooledObject<T>[] GetPool()
+        public T[] GetPool()
         {
             return _pool;
         }
