@@ -76,9 +76,9 @@ namespace LibUR.Pooling.Auxiliary
             return this;
         }
 
-        public PoolCreationData<T> Build()
+        public SPoolCreationData<T> Build()
         {
-            return new PoolCreationData<T>(_name, _size, _parent, _onCreate, _onEnable, _increment, _objectDistribution);
+            return new SPoolCreationData<T>(_name, _size, _parent, _onCreate, _onEnable, _increment, _objectDistribution);
         }
     }
 }

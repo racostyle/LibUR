@@ -9,10 +9,10 @@ namespace LibUR.Pooling
         private readonly GameObject[] _references;
         private GameObject _container;
         private T[] _pool;
-        private PoolCreationData<T> _data;
+        private SPoolCreationData<T> _data;
         private IQueue _queue;
 
-        public PoolFixed_MO(in PoolCreationData<T> data, IQueue queue, GameObject[] references)
+        public PoolFixed_MO(in SPoolCreationData<T> data, IQueue queue, GameObject[] references)
         {
             _data = data;
             _queue = queue;
@@ -40,15 +40,15 @@ namespace LibUR.Pooling
             {
                 for (int x = 0; x < _data.ObjectDistribution[i]; x++)
                 {
-                    var obj = UnityEngine.GameObject.Instantiate(_references[i], Vector3.zero, Quaternion.identity, _container.transform);
+                    var obj = Object.Instantiate(_references[i], Vector3.zero, Quaternion.identity, _container.transform);
                     if (!obj.TryGetComponent<T>(out var component))
                     {
                         Debug.Log($"{component} could not be found!");
                         continue;
                     }
 
+                    _data.InitializeAction?.Invoke(component);
                     _pool[index] = component;
-                    _data.InitializeAction?.Invoke(_pool[index]);
                     obj.SetActive(false);
                     _queue.AddToQueue(index);
                     index++;
