@@ -20,7 +20,7 @@ namespace LibUR.Pooling
             _pool = new T[_data.Size];
 
             if (_references.Length != _data.ObjectDistribution.Length)
-                throw new System.Exception("ObjectRef must much ObjectDistribution length");
+                throw new System.Exception("ObjectRef must match ObjectDistribution length");
 
             CreateLocalContainer(_data.PoolName, _data.ParentContainer);
             PopulatePool(_data.Size);
@@ -61,7 +61,8 @@ namespace LibUR.Pooling
         {
             for (int i = 0; i < _pool.Length; i++)
             {
-                if (!_pool[i].gameObject.activeInHierarchy)
+                var item = _pool[i];
+                if (item != null && !item.gameObject.activeInHierarchy)
                     _queue.AddToQueue(i);
             }
             _queue.RebuildQueue();
@@ -73,14 +74,14 @@ namespace LibUR.Pooling
             {
                 PopulateQueue();
                 if (_queue.Count == 0)
-                    return null;
+                    return default;
             }
 
             int index = _queue.Dequeue();
 
-            _pool[index].gameObject.SetActive(true);
             _pool[index].transform.position = position;
             _data.EnableAction?.Invoke(_pool[index]);
+            _pool[index].gameObject.SetActive(true);
 
             return _pool[index];
         }

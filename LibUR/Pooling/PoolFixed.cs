@@ -54,7 +54,8 @@ namespace LibUR.Pooling
         {
             for (int i = 0; i < _pool.Length; i++)
             {
-                if (!_pool[i].gameObject.activeInHierarchy)
+                var item = _pool[i];
+                if (item != null && !item.gameObject.activeInHierarchy)
                     _queue.AddToQueue(i);
             }
             _queue.RebuildQueue();
@@ -71,9 +72,9 @@ namespace LibUR.Pooling
 
             int index = _queue.Dequeue();
 
-            _pool[index].gameObject.SetActive(true);
             _pool[index].transform.position = position;
             _data.EnableAction?.Invoke(_pool[index]);
+            _pool[index].gameObject.SetActive(true);
 
             return _pool[index];
         }

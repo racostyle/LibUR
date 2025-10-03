@@ -20,6 +20,15 @@ namespace LibUR.Pooling.Auxiliary
         }
 
         /// <summary>
+        /// Parent object for new T objects
+        /// </summary>
+        public PoolCreationDataBuilder<T> SetParent(Transform parent) 
+        { 
+            _parent = parent; 
+            return this; 
+        }
+
+        /// <summary>
         /// Initial size of the pool. In FixedPool this is maximum size and in MultipleObjectsPool this will be overwritten by SetDistribution method
         /// </summary>
         /// <param name="initAction"></param>
@@ -35,7 +44,6 @@ namespace LibUR.Pooling.Auxiliary
         /// 50 first objects, 50 of second object and 20 of the third object. Sum of this values will be the total pool size.
         /// </summary>
         /// <param name="size"></param>
-        /// <returns></returns>
         public PoolCreationDataBuilder<T> SetDistribution(int[] objectDistribution)
         {
             _size = objectDistribution.Sum();
@@ -47,7 +55,6 @@ namespace LibUR.Pooling.Auxiliary
         /// Only used in Flexible pool. This is by how much pool will be resized if there is no more place in the pool
         /// </summary>
         /// <param name="increment"></param>
-        /// <returns></returns>
         public PoolCreationDataBuilder<T> SetIncrement(int increment)
         {
             _increment = increment;
@@ -58,7 +65,6 @@ namespace LibUR.Pooling.Auxiliary
         /// Used when object is created. This enables you to inject required parameters into a class
         /// </summary>
         /// <param name="action"></param>
-        /// <returns></returns>
         public PoolCreationDataBuilder<T> WireInitialize(Action<T> onCreate)
         {
             _onCreate = onCreate;
@@ -69,7 +75,6 @@ namespace LibUR.Pooling.Auxiliary
         /// Used when object enabled. This enables you to inject required parameters into a class when object is created and whenever it is reenabled
         /// </summary>
         /// <param name="initAction"></param>
-        /// <returns></returns>
         public PoolCreationDataBuilder<T> WireEnable(Action<T> onEnable)
         {
             _onEnable = onEnable;

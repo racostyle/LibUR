@@ -15,6 +15,8 @@ namespace LibUR.Pooling
         private T[] _pool;
         private IQueue _queue;
 
+        //TODO change to list and stop overcomplicating every bullshit
+
         public PoolFlexible (in SPoolCreationData<T> data, IQueue queue, GameObject references)
         {
             _data = data;
@@ -58,7 +60,8 @@ namespace LibUR.Pooling
         {
             for (int i = 0; i < _pool.Length; i++)
             {
-                if (!_pool[i].gameObject.activeInHierarchy)
+                var item = _pool[i];
+                if (item != null && !item.gameObject.activeInHierarchy)
                     _queue.AddToQueue(i);
             }
             _queue.RebuildQueue();
@@ -80,9 +83,9 @@ namespace LibUR.Pooling
 
             int index = _queue.Dequeue();
 
-            _pool[index].gameObject.SetActive(true);
             _pool[index].transform.position = position;
             _data.EnableAction?.Invoke(_pool[index]);
+            _pool[index].gameObject.SetActive(true);
             return _pool[index];
         }
 

@@ -9,10 +9,9 @@ namespace LibUR.Pooling.Queues
         private readonly List<int> _indexes;
         private readonly Random _random;
 
-        public QueueRandomized()
-        {
+        public QueueRandomized(int? seed = null) {
+            _random = seed.HasValue ? new Random(seed.Value) : new Random(Guid.NewGuid().GetHashCode());
             _queue = new Queue<int>();
-            _random = new Random();
             _indexes = new List<int>();
         }
 
