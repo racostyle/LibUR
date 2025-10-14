@@ -4,20 +4,22 @@ using UnityEngine;
 
 namespace LibUR.Pooling
 {
-    public class PoolFixed_MO<T> : IPool<T> where T : MonoBehaviour
+    public class PoolFixed_MultipleObjects<T> : IPool<T> where T : MonoBehaviour
     {
+        private readonly PoolHelper<T> _helper;
         private readonly GameObject[] _references;
         private GameObject _container;
         private T[] _pool;
         private SPoolCreationData<T> _data;
         private IQueue _queue;
 
-        public PoolFixed_MO(in SPoolCreationData<T> data, IQueue queue, GameObject[] references)
+        public PoolFixed_MultipleObjects(in SPoolCreationData<T> data, IQueue queue, GameObject[] references)
         {
             _data = data;
             _queue = queue;
             _references = references;
             _pool = new T[_data.Size];
+            _helper = new PoolHelper<T>(_pool, _queue);
 
             if (_references.Length != _data.ObjectDistribution.Length)
                 throw new System.Exception("ObjectRef must match ObjectDistribution length");
@@ -57,33 +59,16 @@ namespace LibUR.Pooling
             _queue.RebuildQueue();
         }
 
-        private void PopulateQueue()
+        public bool TryActivateObject(Vector3 position, out T obj)
         {
-            for (int i = 0; i < _pool.Length; i++)
+            if (!_helper.TryDequeObjectSafeguard(out var item))
             {
-                var item = _pool[i];
-                if (item != null && !item.gameObject.activeInHierarchy)
-                    _queue.AddToQueue(i);
-            }
-            _queue.RebuildQueue();
-        }
-
-        public T ActivateObject(Vector3 position)
-        {
-            if (_queue.Count == 0)
-            {
-                PopulateQueue();
-                if (_queue.Count == 0)
-                    return default;
+                obj = null;
+                return false;
             }
 
-            int index = _queue.Dequeue();
-
-            _pool[index].transform.position = position;
-            _data.EnableAction?.Invoke(_pool[index]);
-            _pool[index].gameObject.SetActive(true);
-
-            return _pool[index];
+            obj = _helper.ActivateObject(item, position, _data.EnableAction);
+            return true;
         }
 
         public T[] GetPool()
@@ -91,9 +76,9 @@ namespace LibUR.Pooling
             return _pool;
         }
 
-        public void Dispose()
+        public void DestroyAll(bool alsoDestroyContainer = true)
         {
-
+            _helper.DestroyAll(alsoDestroyContainer ? _container : null);
         }
     }
 }

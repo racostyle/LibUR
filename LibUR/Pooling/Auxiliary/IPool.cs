@@ -4,8 +4,8 @@ namespace LibUR.Pooling.Auxiliary
 { 
     public interface IPool<T>
     {
-        T ActivateObject(Vector3 position);
+        bool TryActivateObject(Vector3 position, out T obj);
         T[] GetPool();
-        void Dispose();
+        void DestroyAll(bool alsoDestroyContainer = true);
     }
 }

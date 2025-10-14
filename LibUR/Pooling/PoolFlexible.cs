@@ -7,23 +7,25 @@ namespace LibUR.Pooling
 {
     public class PoolFlexible<T> : IPool<T> where T : MonoBehaviour
     {
+        private readonly PoolHelper<T> _helper;
         private readonly GameObject _references;
         private readonly GameObject _container;
         private SPoolCreationData<T> _data;
-        private int _maxPoolSize;
 
         private T[] _pool;
         private IQueue _queue;
 
-        //TODO change to list and stop overcomplicating every bullshit
+        //This class is ment as optional where there MIGH be resizes. It is not ment for many realocations,
+        //but more as a safeguard for bullets, effects... T[] is faster than List<T> and with less overhead
+        //IF the reasize is not called often. 
 
-        public PoolFlexible (in SPoolCreationData<T> data, IQueue queue, GameObject references)
+        public PoolFlexible(in SPoolCreationData<T> data, IQueue queue, GameObject references)
         {
             _data = data;
             _queue = queue;
             _references = references;
-            _maxPoolSize = data.Size;
             _pool = new T[_data.Size];
+            _helper = new PoolHelper<T>(_pool, _queue);
 
             _container = CreateLocalContainer(data.PoolName, data.ParentContainer);
             PopulatePool(0, data.Size);
@@ -56,37 +58,16 @@ namespace LibUR.Pooling
             _queue.RebuildQueue();
         }
 
-        private void PopulateQueue()
+        public bool TryActivateObject(Vector3 position, out T obj)
         {
-            for (int i = 0; i < _pool.Length; i++)
+            if (!_helper.TryDequeObjectSafeguard(out var item))
             {
-                var item = _pool[i];
-                if (item != null && !item.gameObject.activeInHierarchy)
-                    _queue.AddToQueue(i);
-            }
-            _queue.RebuildQueue();
-        }
-
-        public T ActivateObject(Vector3 position)
-        {
-            if (_queue.Count == 0)
-            {
-                PopulateQueue();
-                if (_queue.Count == 0)
-                {
-                    var currentSize = _maxPoolSize;
-                    Array.Resize(ref _pool, _maxPoolSize + _data.Increment);
-                    PopulatePool(currentSize, _pool.Length);
-                    _maxPoolSize += _data.Increment;
-                }
+                obj = null;
+                return false;
             }
 
-            int index = _queue.Dequeue();
-
-            _pool[index].transform.position = position;
-            _data.EnableAction?.Invoke(_pool[index]);
-            _pool[index].gameObject.SetActive(true);
-            return _pool[index];
+            obj = _helper.ActivateObject(item, position, _data.EnableAction);
+            return true;
         }
 
         public T[] GetPool()
@@ -94,9 +75,9 @@ namespace LibUR.Pooling
             return _pool;
         }
 
-        public void Dispose()
+        public void DestroyAll(bool alsoDestroyContainer = true)
         {
-
+            _helper.DestroyAll(alsoDestroyContainer ? _container : null);
         }
     }
 }

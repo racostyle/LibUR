@@ -6,6 +6,7 @@ namespace LibUR.Pooling
 {
     public class PoolFixed<T> : IPool<T> where T : MonoBehaviour
     {
+        private readonly PoolHelper<T> _helper;
         private readonly GameObject _objectRef;
         private readonly GameObject _container;
         private T[] _pool;
@@ -18,6 +19,7 @@ namespace LibUR.Pooling
             _queue = queue;
             _objectRef = reference;
             _pool = new T[_data.Size];
+            _helper = new PoolHelper<T>(_pool, _queue);
 
             _container = CreateLocalContainer(_data.PoolName, _data.ParentContainer);
             PopulatePool(_data.Size);
@@ -50,33 +52,16 @@ namespace LibUR.Pooling
             _queue.RebuildQueue();
         }
 
-        private void PopulateQueue()
+        public bool TryActivateObject(Vector3 position, out T obj)
         {
-            for (int i = 0; i < _pool.Length; i++)
+            if (!_helper.TryDequeObjectSafeguard(out var item))
             {
-                var item = _pool[i];
-                if (item != null && !item.gameObject.activeInHierarchy)
-                    _queue.AddToQueue(i);
-            }
-            _queue.RebuildQueue();
-        }
-
-        public T ActivateObject(Vector3 position)
-        {
-            if (_queue.Count == 0)
-            {
-                PopulateQueue();
-                if (_queue.Count == 0)
-                    return default;
+                obj = null;
+                return false;
             }
 
-            int index = _queue.Dequeue();
-
-            _pool[index].transform.position = position;
-            _data.EnableAction?.Invoke(_pool[index]);
-            _pool[index].gameObject.SetActive(true);
-
-            return _pool[index];
+            obj = _helper.ActivateObject(item, position, _data.EnableAction);
+            return true;
         }
 
         public T[] GetPool()
@@ -84,9 +69,9 @@ namespace LibUR.Pooling
             return _pool;
         }
 
-        public void Dispose()
+        public void DestroyAll(bool alsoDestroyContainer = true)
         {
-
+            _helper.DestroyAll(alsoDestroyContainer ? _container : null);
         }
     }
 }

@@ -32,6 +32,11 @@ namespace LibUR.Pooling.Queues
             return _queue.Dequeue();
         }
 
+        public void Clear()
+        {
+            _queue.Clear();
+        }
+
         public int Count => _queue.Count;
     }
 }

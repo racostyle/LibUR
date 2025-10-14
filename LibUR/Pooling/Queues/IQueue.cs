@@ -5,9 +5,10 @@ namespace LibUR.Pooling.Queues
 {
     public interface IQueue
     {
-        public void AddToQueue(int i);
-        public void RebuildQueue();
-        public int Dequeue();
-        public int Count { get; }
+        void AddToQueue(int i);
+        void RebuildQueue();
+        int Dequeue();
+        void Clear();
+        int Count { get; }
     }
 }
