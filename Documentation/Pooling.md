@@ -1,186 +1,201 @@
-# **LibUR.Pooling** — Object Pooling System for Unity
+# **LibUR.Pooling** — Updated Overview (v2)
 
-LibUR.Pooling is a lightweight, flexible object pooling framework for Unity designed to improve performance by reusing objects instead of frequently instantiating and destroying them. It supports both **fixed-size**, **multiple object types**, and **flexible (expandable)** pools.
-
----
-
-## **Core Components**
-
-### **1. PoolCreationData<T>**
-
-> _Located in `PoolCreationData.cs`_
-
-Defines the creation settings for a pool:
-
-- **PoolName** — Unique name of the pool.
-- **Size** — Initial size of the pool.
-- **Increment** — Amount by which the pool grows if exhausted (only for flexible pools).
-- **ParentContainer** — Optional parent `Transform` to organize pooled objects in the hierarchy.
-- **InitializeAction** — Action invoked when a pooled object is created.
-- **EnableAction** — Action invoked when a pooled object is enabled (reused).
-- **ObjectDistribution** — Distribution of different objects (used only for multiple object pools).
+LibUR.Pooling provides a **modular object pooling system for Unity** built around strong type-safety, optional expansion, and queue-based activation strategies.
+It supports **fixed**, **multi-prefab**, and **flexible (expandable)** pools with identical usage patterns.
 
 ---
 
-### **2. PoolCreationDataBuilder<T>**
+## 🧩 Core Architecture
 
-> _Located in `PoolCreationDataBuilder.cs`_
+### **IPool<T>**
 
-Builder class for configuring a `PoolCreationData<T>`.  
-**Usage Example**:
+Located in `IPool.cs`
+
+Common contract for all pool types.
 
 ```csharp
-var builder = new PoolCreationDataBuilder<MyComponent>("enemyPool")
-    .SetSize(50)
-    .WireInitialize(obj => obj.Initialize())
-    .WireEnable(obj => obj.ResetState());
-var poolData = builder.Build();
+public interface IPool<T>
+{
+    bool TryActivateObject(Vector3 position, out T obj);
+    T[] GetPool();
+    void DestroyAll(bool alsoDestroyContainer = true);
+}
 ```
 
-**Main methods:**
-
-- `.SetSize(int size)`
-- `.SetDistribution(int[] objectDistribution)`
-- `.SetIncrement(int increment)`
-- `.WireInitialize(Action<T> onCreate)`
-- `.WireEnable(Action<T> onEnable)`
-- `.Build()`
+- **TryActivateObject** — Returns an available object positioned at the given location. Returns `false` if the pool is empty.
+- **GetPool** — Access the internal array of pooled instances.
+- **DestroyAll** — Deactivates and optionally destroys all pooled instances (and their container).
 
 ---
 
-### **3. IPool<T>**
+### **SPoolCreationData<T>**
 
-> _Located in `IPool.cs`_
+Located in `SPoolCreationData.cs`
 
-Interface for any pool.
+Immutable struct holding all pool configuration data:
+
+| Field                | Description                                |
+| -------------------- | ------------------------------------------ |
+| `PoolName`           | Unique pool name.                          |
+| `Size`               | Initial pool size.                         |
+| `Increment`          | Expansion size for flexible pools.         |
+| `ParentContainer`    | Optional parent transform.                 |
+| `InitializeAction`   | Fired when an object is first created.     |
+| `EnableAction`       | Fired whenever an object is reused.        |
+| `ObjectDistribution` | Distribution array for multi-prefab pools. |
+
+---
+
+### **PoolCreationDataBuilder<T>**
+
+Located in `PoolCreationDataBuilder.cs`
+
+Fluent builder for constructing a `SPoolCreationData<T>` instance.
 
 ```csharp
-PooledObject<T> ActivatePooledObject(Vector3 position);
-PooledObject<T>[] GetPool();
+var data = new PoolCreationDataBuilder<Bullet>("Bullets")
+    .SetSize(100)
+    .SetIncrement(10)
+    .WireInitialize(b => b.InitOnCreate())
+    .WireEnable(b => b.OnReuse())
+    .Build();
 ```
 
 ---
 
-## **Queue Systems**
+### **PoolHelper<T>**
 
-Queues manage the order in which pooled objects are activated.
+Located in `PoolHelper.cs`
+
+Internal utility that:
+
+- Manages queue refilling (`EnsureQueueNotEmpty`).
+- Handles activation logic (`ActivateObject`).
+- Performs safe teardown (`DestroyAll`).
+
+This keeps individual pool classes focused on instantiation and sizing only.
+
+---
+
+## ⚙️ Queues
 
 ### **IQueue**
 
-> _Located in `IQueue.cs`_
+Located in `IQueue.cs`
 
-Queue interface for custom queuing strategies.
-
-- `void AddToQueue(int i)`
-- `void RebuildQueue()`
-- `int Dequeue()`
-- `int Count { get; }`
-
----
+Defines a strategy for activation order.
 
 ### **QueueOrdered**
 
-> _Located in `QueueOrdered.cs`_
-
-Processes objects **in order of addition** (FIFO).
-
----
+Located in `QueueOrdered.cs`
+Standard FIFO queue (useful for deterministic reuse).
 
 ### **QueueRandomized**
 
-> _Located in `QueueRandomized.cs`_
-
-Processes objects **in randomized order** by shuffling before enqueueing.
+Located in `QueueRandomized.cs`
+Randomizes activation order using an internal shuffle.
 
 ---
 
-## **Pool Types**
+## 🧱 Pool Implementations
 
 ### **PoolFixed<T>**
 
-> _Located in `PoolFixed.cs`_
+Located in `PoolFixed.cs`
 
-Fixed-size single object pool.
+- Uses a **single prefab reference**.
+- Fixed size (no growth).
+- Ideal for predictable object counts (e.g., 100 bullets max).
 
-- Does not grow.
-- Uses a single `ObjectRef`.
-- Suitable when pool size can be predetermined.
+```csharp
+var pool = new PoolFixed<Bullet>(
+    in data,
+    new QueueOrdered(),
+    bulletPrefab
+);
+```
+
+**Activation:**
+
+```csharp
+if (pool.TryActivateObject(spawnPos, out var bullet))
+    bullet.Fire();
+```
 
 ---
 
-### **APoolFixed_MultipleObjects<T>**
+### **PoolFixed_MultipleObjects<T>**
 
-> _Located in `PoolFixed_MO.cs`_
+Located in `PoolFixed_MultipleObjects.cs`
 
-Fixed-size pool supporting **multiple types** of objects.
+Supports **multiple prefab types** in one pool.
 
-- Accepts an array of `ObjectRef`.
-- Requires setting `ObjectDistribution` to control how many of each prefab type are instantiated.
+| Field                  | Description                           |
+| ---------------------- | ------------------------------------- |
+| `references[]`         | Array of prefab objects.              |
+| `ObjectDistribution[]` | Number of each prefab to instantiate. |
+
+```csharp
+var data = new PoolCreationDataBuilder<Enemy>("EnemyPool")
+    .SetDistribution(new[] { 30, 20, 10 }) // 60 total
+    .WireInitialize(e => e.Setup())
+    .WireEnable(e => e.Reset())
+    .Build();
+
+var pool = new PoolFixed_MultipleObjects<Enemy>(
+    in data,
+    new QueueRandomized(),
+    enemyPrefabs
+);
+```
 
 ---
 
 ### **PoolFlexible<T>**
 
-> _Located in `PoolFlexible.cs`_
+_(Implementation mirrors PoolFixed<T>, but expands when empty.)_
 
-Flexible-size pool that grows when empty.
+- Grows by `Increment` when all objects are active.
+- Suitable for highly dynamic or unpredictable use cases.
 
-- Grows by a specified `Increment`.
-- Useful when pool size is dynamic and unpredictable (e.g., bullet hell games).
-
----
-
-## **How It Works**
-
-1. **Setup**
-   - Create a **PoolCreationData** using the builder.
-   - Define object initialization (`WireInitialize`) and reactivation (`WireEnable`) behaviors.
-2. **Initialization**
-   - Instantiate and initialize the pool using one of the `Pool*` base classes.
-3. **Usage**
-   - Call `ActivatePooledObject(Vector3 position)` to retrieve an object from the pool.
-   - Object will be positioned, activated, and ready for use.
-4. **Automatic Management**
-   - **Fixed Pools**: Pull from queue, refill if needed.
-   - **Flexible Pools**: Expand when exhausted.
-
----
-
-## **Example Usage**
+Expected constructor signature:
 
 ```csharp
-public class BulletPool : MonoBehaviour
-{
-    [SerializeField] GameObject ObjectRef;
-    private PoolingInfo _poolingInfo;
-    private IPool<Bullet> _pool;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        _poolingInfo = GetComponent<Bullet>();
-        var creationData = new PoolCreationDataBuilder<Bullet>("Bullets")
-            .SetSize(_poolingInfo.Size)
-            .SetIncrement(_poolingInfo.Increment)
-            .WireInitialize((Bullet bullet) => sphere.Init("this is fired only on creation"))
-            .WireEnable((Bullet bullet) => sphere.Reset("this is fired whenever object is enabled"))
-            .Build();
-
-        _pool = new PoolFlexible<Bullet>(in creationData, new QueueOrdered(), ObjectRef);
-    }
-}
-```
-
-To spawn a bullet:
-
-```csharp
-var bullet = myBulletPool.ActivatePooledObject(spawnPosition);
+var pool = new PoolFlexible<Bullet>(
+    in data,
+    new QueueOrdered(),
+    bulletPrefab
+);
 ```
 
 ---
 
-# **Notes**
+## 🚀 Usage Flow
 
-- `PopulateQueue()` is used internally to refill the pool if inactive objects are available.
-- Be mindful of setting the correct `ObjectRef` or `ObjectRefs[]` array in the Unity Inspector.
-- For `PoolFixed_MO`, ensure the **length of ObjectRef[] matches ObjectDistribution[]**.
+1. **Build** the pool data using the builder.
+2. **Instantiate** a pool type (Fixed, Multi, or Flexible).
+3. **Activate** objects using `TryActivateObject(position, out obj)`.
+4. **Recycle** objects by deactivating their `GameObject` when done.
+5. **Cleanup** using `DestroyAll()` during `OnDestroy()` or shutdown.
+
+---
+
+## 🧩 Key Differences from Older Docs
+
+| Aspect             | Old                                          | New                                                |
+| ------------------ | -------------------------------------------- | -------------------------------------------------- |
+| Activation         | `ActivatePooledObject()` (returned directly) | `TryActivateObject()` (bool + out param)           |
+| Queue interface    | `Dequeue()` only                             | Added `TryDequeue()` and `Clear()`                 |
+| Pool configuration | `PoolCreationData` class                     | `SPoolCreationData` struct + builder               |
+| Helper             | Previously internal logic per pool           | Centralized in `PoolHelper<T>`                     |
+| Destruction        | No unified method                            | `DestroyAll()` now standard                        |
+| Flexible pools     | Not implemented yet                          | Designed to mirror fixed logic with dynamic growth |
+
+---
+
+## ✅ Notes
+
+- **Destroyed prefab safety:** `PoolHelper.TryDequeObjectSafeguard` skips nulls caused by playmode reloads.
+- **Container cleanup:** `DestroyAll(true)` removes the parent container GameObject.
+- **Multiple object pools:** Ensure `references.Length == ObjectDistribution.Length`.
+- **Thread-safe:** Unity object operations occur on the main thread; no async use.
