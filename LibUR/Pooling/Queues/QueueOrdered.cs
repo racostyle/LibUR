@@ -31,17 +31,9 @@ namespace LibUR.Pooling.Queues
         {
             return _queue.Dequeue();
         }
-        
-        public bool TryDequeue(out int index)
-        {
-            if (_queue.Count == 0) { index = default; return false; }
-            index = _queue.Dequeue();
-            return true;
-        }
 
         public void Clear()
         {
-            _indexes.Clear();
             _queue.Clear();
         }
 

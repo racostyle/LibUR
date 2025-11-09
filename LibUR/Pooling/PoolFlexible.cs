@@ -46,11 +46,11 @@ namespace LibUR.Pooling
                 var obj = UnityEngine.Object.Instantiate(_references, Vector3.zero, Quaternion.identity, _container.transform);
                 if (!obj.TryGetComponent<T>(out var component))
                 {
-                    Debug.LogError($"PoolFlexible<{typeof(T).Name}>: component not found on prefab '{_references.name}'.");
+                    Debug.Log($"{component} could not be found!");
                     continue;
                 }
 
-                _data.InitializeAction?.Invoke(component);
+                _data.InitializeAction?.Invoke(component, 1, null);
                 _pool[index] = component;
                 obj.SetActive(false);
                 _queue.AddToQueue(index);

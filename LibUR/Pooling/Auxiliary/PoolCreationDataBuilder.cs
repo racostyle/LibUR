@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace LibUR.Pooling.Auxiliary
         private int _size;
         private int _increment;
         private Transform _parent;
-        private Action<T> _onCreate;
+        private Action<T, int, List<object>> _onCreate;
         private Action<T> _onEnable;
         private int[] _objectDistribution;
 
@@ -65,7 +66,7 @@ namespace LibUR.Pooling.Auxiliary
         /// Used when object is created. This enables you to inject required parameters into a class
         /// </summary>
         /// <param name="action"></param>
-        public PoolCreationDataBuilder<T> WireInitialize(Action<T> onCreate)
+        public PoolCreationDataBuilder<T> WireInitialize(Action<T, int, List<object>> onCreate)
         {
             _onCreate = onCreate;
             return this;

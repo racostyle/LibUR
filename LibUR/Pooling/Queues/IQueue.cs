@@ -7,7 +7,6 @@ namespace LibUR.Pooling.Queues
     {
         void AddToQueue(int i);
         void RebuildQueue();
-        bool TryDequeue(out int index);
         int Dequeue();
         void Clear();
         int Count { get; }
