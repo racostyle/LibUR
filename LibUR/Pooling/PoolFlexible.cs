@@ -50,7 +50,11 @@ namespace LibUR.Pooling
                     continue;
                 }
 
-                _data.InitializeAction?.Invoke(component, 1, null);
+                object additionalInfo = null;
+                if (_data.AdditionalInfo.Count > index)
+                    additionalInfo = _data.AdditionalInfo[index];
+
+                _data.InitializeAction?.Invoke(component, 0, additionalInfo);
                 _pool[index] = component;
                 obj.SetActive(false);
                 _queue.AddToQueue(index);
