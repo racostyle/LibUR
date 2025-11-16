@@ -37,21 +37,24 @@ namespace LibUR.Pooling
 
         private void PopulatePool(int size)
         {
-            for (int index = 0; index < _data.ObjectDistribution.Length; index++)
+            int spawnIndex = 0;
+            for (int objectTypeIndex = 0; objectTypeIndex < _data.ObjectDistribution.Length; objectTypeIndex++)
             {
-                for (int x = 0; x < _data.ObjectDistribution[index]; x++)
+                for (int specificObjectCounter = 0; specificObjectCounter < _data.ObjectDistribution[objectTypeIndex]; specificObjectCounter++)
                 {
-                    var obj = Object.Instantiate(_references[index], Vector3.zero, Quaternion.identity, _container.transform);
+                    var obj = Object.Instantiate(_references[objectTypeIndex], Vector3.zero, Quaternion.identity, _container.transform);
                     if (!obj.TryGetComponent<T>(out var component))
                     {
                         Debug.Log($"{component} could not be found!");
                         continue;
                     }
 
-                    _data.InitializeAction?.Invoke(component, index);
-                    _pool[index] = component;
+                    _data.InitializeAction?.Invoke(component, objectTypeIndex);
+
+                    _pool[spawnIndex] = component;
                     obj.SetActive(false);
-                    _queue.AddToQueue(index);
+                    _queue.AddToQueue(spawnIndex);
+                    spawnIndex++;
                 }
             }
             _queue.RebuildQueue();
