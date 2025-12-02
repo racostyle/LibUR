@@ -1,6 +1,7 @@
 ﻿using LibUR.Pooling.Auxiliary;
 using LibUR.Pooling.Queues;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 namespace LibUR.Pooling
 {
@@ -63,6 +64,22 @@ namespace LibUR.Pooling
 
             obj = _helper.ActivateObject(item, position, _data.EnableAction);
             return true;
+        }
+
+        public bool TwoStep_SelectAndDequeueObject(out T obj)
+        {
+            if (!_helper.TryDequeObjectSafeguard(_pooledObjects, out var item))
+            {
+                obj = null;
+                return false;
+            }
+            obj = item;
+            return true;
+        }
+
+        public void TwoStep_EnableObject(Vector3 position, T obj)
+        {
+            _helper.ActivateObject(obj, position, _data.EnableAction);
         }
 
         public T[] GetPool()

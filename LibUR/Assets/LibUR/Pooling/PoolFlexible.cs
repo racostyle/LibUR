@@ -51,28 +51,59 @@ namespace LibUR.Pooling
 
         public bool TryActivateObject(Vector3 position, out T obj)
         {
-            if (!_helper.TryDequeObjectSafeguard(_pooledObjects, out var item))
+            if (!TryGetObject_ResizeIfEmptyQueue(out var item))
             {
-                var oldSize = _pooledObjects.Length;
-                Array.Resize(ref _pooledObjects, oldSize + _data.Increment);
-                PopulatePool(oldSize, _pooledObjects.Length);
-
-                if (!_helper.TryDequeObjectSafeguard(_pooledObjects, out var newItem))
-                {
-                    obj = null;
-                    return false;
-                }
-
-                item = newItem;
+                obj = item;
+                return false;
             }
 
             obj = _helper.ActivateObject(item, position, _data.EnableAction);
             return true;
         }
 
+        public bool TwoStep_SelectAndDequeueObject(out T obj)
+        {
+            if (!TryGetObject_ResizeIfEmptyQueue(out var item))
+            {
+                obj = item;
+                return false;
+            }
+
+            obj = item;
+            return true;
+        }
+
+        public void TwoStep_EnableObject(Vector3 position, T obj)
+        {
+            _helper.ActivateObject(obj, position, _data.EnableAction);
+        }
+
         public T[] GetPool()
         {
             return _pooledObjects;
+        }
+
+
+        private bool TryGetObject_ResizeIfEmptyQueue(out T selected)
+        {
+            if (!_helper.TryDequeObjectSafeguard(_pooledObjects, out var item1))
+            {
+                var oldSize = _pooledObjects.Length;
+                Array.Resize(ref _pooledObjects, oldSize + _data.Increment);
+                PopulatePool(oldSize, _pooledObjects.Length);
+
+                if (!_helper.TryDequeObjectSafeguard(_pooledObjects, out var item2))
+                {
+                    selected = null;
+                    return false;
+                }
+
+                selected = item2;
+                return true;
+            }
+
+            selected = item1;
+            return true;
         }
 
         public void DestroyAll(bool alsoDestroyContainer = true)

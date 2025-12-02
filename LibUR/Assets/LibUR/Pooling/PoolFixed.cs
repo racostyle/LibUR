@@ -56,6 +56,22 @@ namespace LibUR.Pooling
             return true;
         }
 
+        public bool TwoStep_SelectAndDequeueObject(out T obj)
+        {
+            if (!_helper.TryDequeObjectSafeguard(_pooledObjects, out var item))
+            {
+                obj = null;
+                return false;
+            }
+            obj = item;
+            return true;
+        }
+
+        public void TwoStep_EnableObject(Vector3 position, T obj)
+        {
+            _helper.ActivateObject(obj, position, _data.EnableAction);
+        }
+
         public T[] GetPool()
         {
             return _pooledObjects;
