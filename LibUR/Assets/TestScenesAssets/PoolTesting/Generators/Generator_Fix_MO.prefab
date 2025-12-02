@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3993091144347926664
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 901873297553748068}
+  - component: {fileID: -157250482694737833}
+  - component: {fileID: -4888446280745491743}
+  m_Layer: 0
+  m_Name: Generator_Fix_MO
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &901873297553748068
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3993091144347926664}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-157250482694737833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3993091144347926664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c07cee84db211c846880ba85590ce8eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectsRef:
+  - {fileID: 5384118779020703276, guid: 4ef7797ef36396c4597e7832e008715b, type: 3}
+  - {fileID: 5384118779020703276, guid: 16a44e1b4ad294140b56fe4efd5c0f72, type: 3}
+  - {fileID: 5384118779020703276, guid: c1ed60a5bbe4f0b47a88de5deb0f3c25, type: 3}
+--- !u!114 &-4888446280745491743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3993091144347926664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab727de1866043245bd3eb52a02e6e4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpawnAmount: 10
+  SpawnRate: 1
+  Increment: 50
+  Size: 1000
+  ObjectDistribution: 0a0000000a00000005000000
