@@ -9,7 +9,7 @@ namespace LibUR.Pooling
         private readonly PoolHelper<T> _helper;
         private readonly GameObject _objectRef;
         private readonly GameObject _container;
-        private T[] _pool;
+        private T[] _pooledObjects;
         private SPoolCreationData<T> _data;
         private IQueue _queue;
 
@@ -18,19 +18,11 @@ namespace LibUR.Pooling
             _data = data;
             _queue = queue;
             _objectRef = reference;
-            _pool = new T[_data.Size];
-            _helper = new PoolHelper<T>(_pool, _queue);
+            _pooledObjects = new T[_data.Size];
+            _helper = new PoolHelper<T>(_pooledObjects, _queue);
 
-            _container = CreateLocalContainer(_data.PoolName, _data.ParentContainer);
+            _container = _helper.CreateLocalContainer(_data.PoolName, _data.ParentContainer);
             PopulatePool(_data.Size);
-        }
-
-        private GameObject CreateLocalContainer(string poolName, Transform parentContainer)
-        {
-            var container = new GameObject();
-            container.transform.SetParent(parentContainer);
-            container.name = $"Pool_{poolName}".ToLower();
-            return container;
         }
 
         private void PopulatePool(int size)
@@ -45,7 +37,7 @@ namespace LibUR.Pooling
                 }
 
                 _data.InitializeAction?.Invoke(component, 0);
-                _pool[index] = component;
+                _pooledObjects[index] = component;
                 obj.SetActive(false);
                 _queue.AddToQueue(index);
             }
@@ -66,7 +58,7 @@ namespace LibUR.Pooling
 
         public T[] GetPool()
         {
-            return _pool;
+            return _pooledObjects;
         }
 
         public void DestroyAll(bool alsoDestroyContainer = true)

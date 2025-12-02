@@ -9,7 +9,7 @@ namespace LibUR.Pooling
         private readonly PoolHelper<T> _helper;
         private readonly GameObject[] _references;
         private GameObject _container;
-        private T[] _pool;
+        private T[] _pooledObjects;
         private SPoolCreationData<T> _data;
         private IQueue _queue;
 
@@ -18,21 +18,14 @@ namespace LibUR.Pooling
             _data = data;
             _queue = queue;
             _references = references;
-            _pool = new T[_data.Size];
-            _helper = new PoolHelper<T>(_pool, _queue);
+            _pooledObjects = new T[_data.Size];
+            _helper = new PoolHelper<T>(_pooledObjects, _queue);
 
             if (_references.Length != _data.ObjectDistribution.Length)
                 throw new System.Exception("ObjectRef must match ObjectDistribution length");
 
-            CreateLocalContainer(_data.PoolName, _data.ParentContainer);
+            _container = _helper.CreateLocalContainer(_data.PoolName, _data.ParentContainer);
             PopulatePool(_data.Size);
-        }
-
-        private void CreateLocalContainer(string poolName, Transform parentContainer)
-        {
-            _container = new GameObject();
-            _container.transform.SetParent(parentContainer);
-            _container.name = $"Pool_{poolName}".ToLower();
         }
 
         private void PopulatePool(int size)
@@ -51,7 +44,7 @@ namespace LibUR.Pooling
 
                     _data.InitializeAction?.Invoke(component, objectTypeIndex);
 
-                    _pool[spawnIndex] = component;
+                    _pooledObjects[spawnIndex] = component;
                     obj.SetActive(false);
                     _queue.AddToQueue(spawnIndex);
                     spawnIndex++;
@@ -74,7 +67,7 @@ namespace LibUR.Pooling
 
         public T[] GetPool()
         {
-            return _pool;
+            return _pooledObjects;
         }
 
         public void DestroyAll(bool alsoDestroyContainer = true)

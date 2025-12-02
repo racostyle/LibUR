@@ -12,7 +12,7 @@ namespace LibUR.Pooling
         private readonly GameObject _container;
         private SPoolCreationData<T> _data;
 
-        private T[] _pool;
+        private T[] _pooledObjects;
         private IQueue _queue;
 
         //This class is ment as optional where there MIGH be resizes. It is not ment for many realocations,
@@ -24,19 +24,11 @@ namespace LibUR.Pooling
             _data = data;
             _queue = queue;
             _references = references;
-            _pool = new T[_data.Size];
-            _helper = new PoolHelper<T>(_pool, _queue);
+            _pooledObjects = new T[_data.Size];
+            _helper = new PoolHelper<T>(_pooledObjects, _queue);
 
-            _container = CreateLocalContainer(data.PoolName, data.ParentContainer);
+            _container = _helper.CreateLocalContainer(data.PoolName, data.ParentContainer);
             PopulatePool(0, data.Size);
-        }
-
-        private GameObject CreateLocalContainer(string poolName, Transform parentContainer)
-        {
-            var container = new GameObject();
-            container.transform.SetParent(parentContainer);
-            container.name = $"Pool_{poolName}".ToLower();
-            return container;
         }
 
         private void PopulatePool(int start, int size)
@@ -51,7 +43,7 @@ namespace LibUR.Pooling
                 }
 
                 _data.InitializeAction?.Invoke(component, 0);
-                _pool[index] = component;
+                _pooledObjects[index] = component;
                 obj.SetActive(false);
                 _queue.AddToQueue(index);
             }
@@ -72,7 +64,7 @@ namespace LibUR.Pooling
 
         public T[] GetPool()
         {
-            return _pool;
+            return _pooledObjects;
         }
 
         public void DestroyAll(bool alsoDestroyContainer = true)
