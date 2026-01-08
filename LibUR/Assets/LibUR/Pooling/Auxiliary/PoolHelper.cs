@@ -8,6 +8,11 @@ namespace LibUR.Pooling.Auxiliary
     {
         private readonly IQueue _queue;
 
+        public PoolHelper()
+        {
+            
+        }
+
         public PoolHelper(IQueue queue)
         {
             _queue = queue;
