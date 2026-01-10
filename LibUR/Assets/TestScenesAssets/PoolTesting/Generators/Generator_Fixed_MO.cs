@@ -7,7 +7,6 @@ public class Generator_Fixed_MO : MonoBehaviour
 {
     [SerializeField] GameObject[] ObjectsRef;
     int counter = 0;
-    SPoolCreationData<SphereGM> creationData;
     PoolingInfo _poolingInfo;
     IPool<SphereGM> _pool;
 
@@ -16,10 +15,11 @@ public class Generator_Fixed_MO : MonoBehaviour
     {
         _poolingInfo = GetComponent<PoolingInfo>();
 
-        creationData = new PoolCreationDataBuilder<SphereGM>("Spheres")
-            .SetDistribution(_poolingInfo.ObjectDistribution)
-            .WireInitialize((SphereGM sphere, int index) => sphere.InitOnCreate("this is injected on creation"))
-            .WireEnable((SphereGM sphere) => sphere.ReInit("this is injected whenever object is enabled"))
+        var creationData = new PoolCreationDataBuilder<SphereGM>("Spheres")
+            .SetParent(transform)
+            .SetDistribution_Manual(_poolingInfo.ObjectDistribution)
+            .WireOnInitialize((SphereGM sphere, int index) => sphere.InitOnCreate("this is injected on creation"))
+            .WireOnEnable((SphereGM sphere) => sphere.ReInit("this is injected whenever object is enabled"))
             .Build();
 
         _pool = new PoolFixed_MultipleObjects<SphereGM>(in creationData, new QueueRandomized(), ObjectsRef);
