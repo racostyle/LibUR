@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace LibUR.Pooling.Auxiliary
 {
+    /// <summary>
+    /// Builder class for creating pool configuration data with a fluent interface.
+    /// Allows step-by-step configuration of pool parameters using method chaining.
+    /// Use this for complex pool configurations that benefit from readable, chainable setup.
+    /// </summary>
+    /// <typeparam name="T">The MonoBehaviour component type to pool</typeparam>
     public class PoolCreationDataBuilder<T> where T : MonoBehaviour
     {
         private string _name;
@@ -14,6 +20,10 @@ namespace LibUR.Pooling.Auxiliary
         private Action<T> _onEnable;
         private int[] _objectDistribution;
 
+        /// <summary>
+        /// Creates a new builder instance with the specified pool name.
+        /// </summary>
+        /// <param name="name">Name of the pool (required)</param>
         public PoolCreationDataBuilder(string name)
         {
             _name = name;
@@ -57,6 +67,15 @@ namespace LibUR.Pooling.Auxiliary
             return this;
         }
 
+        /// <summary>
+        /// Sets a fixed distribution where each object type gets the same count.
+        /// For example, SetDistribution_Fixed(3, 50) creates [50, 50, 50] distribution.
+        /// The total pool size will be objectsCount * value.
+        /// Only used by PoolFixed_MultipleObjects. Not needed for PoolFixed or PoolFlexible.
+        /// </summary>
+        /// <param name="objectsCount">Number of different object types</param>
+        /// <param name="value">Count of objects to create for each type</param>
+        /// <returns>This builder instance for method chaining</returns>
         public PoolCreationDataBuilder<T> SetDistribution_Fixed(int objectsCount, int value)
         {
             _objectDistribution = new int[objectsCount];
@@ -65,6 +84,16 @@ namespace LibUR.Pooling.Auxiliary
             return this;
         }
 
+        /// <summary>
+        /// Automatically calculates a distribution array based on total size and number of object types.
+        /// Uses a weighted distribution algorithm where the first object gets the largest share (50%),
+        /// middle objects get progressively smaller shares (60% of remaining), and the last object gets the remainder.
+        /// Requires at least 3 object types and a minimum total size of objectsCount * 5.
+        /// </summary>
+        /// <param name="totalSize">Total number of objects to create (sum of distribution)</param>
+        /// <param name="objectsCount">Number of different object types (must be at least 3)</param>
+        /// <returns>This builder instance for method chaining</returns>
+        /// <exception cref="ArgumentException">Thrown when objectsCount is less than 3 or totalSize is less than objectsCount * 5</exception>
         public PoolCreationDataBuilder<T> SetDistribution_AutoCalculate(int totalSize, int objectsCount)
         {
             if (objectsCount < 3)
@@ -151,6 +180,11 @@ namespace LibUR.Pooling.Auxiliary
             return this;
         }
 
+        /// <summary>
+        /// Builds and returns an IPoolCreationData instance with all configured parameters.
+        /// Call this after setting all desired pool configuration parameters.
+        /// </summary>
+        /// <returns>An IPoolCreationData instance ready to use for pool creation</returns>
         public IPoolCreationData<T> Build()
         {
             return new PoolCreationData(_name, _size, _parent, _onCreate, _onEnable, _increment, _objectDistribution);
@@ -158,6 +192,7 @@ namespace LibUR.Pooling.Auxiliary
 
         /// <summary>
         /// Private nested class implementing IPoolCreationData. Only accessible from within PoolCreationDataBuilder.
+        /// This is the concrete implementation returned by Build().
         /// </summary>
         private class PoolCreationData : IPoolCreationData<T>
         {
@@ -169,6 +204,16 @@ namespace LibUR.Pooling.Auxiliary
             public Action<T> EnableAction { get; private set; }
             public int[] ObjectDistribution { get; private set; }
 
+            /// <summary>
+            /// Creates a new PoolCreationData instance with the specified parameters.
+            /// </summary>
+            /// <param name="name">Name of the pool</param>
+            /// <param name="size">Initial size of the pool</param>
+            /// <param name="parent">Parent transform container for pooled objects</param>
+            /// <param name="onInit">Action called when an object is first created (optional)</param>
+            /// <param name="onEnable">Action called when an object is enabled/activated (optional)</param>
+            /// <param name="increment">Amount by which the pool resizes when exhausted (only for PoolFlexible)</param>
+            /// <param name="objectDistribution">Distribution array for multiple object types (only for PoolFixed_MultipleObjects)</param>
             public PoolCreationData(
                 string name,
                 int size,

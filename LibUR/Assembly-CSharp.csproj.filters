@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{Assets}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\LibUR">
+      <UniqueIdentifier>{LibUR}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\LibUR\Delegates">
+      <UniqueIdentifier>{LibUR_Delegates}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\LibUR\GameStates">
+      <UniqueIdentifier>{LibUR_GameStates}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\LibUR\Instantiation">
+      <UniqueIdentifier>{LibUR_Instantiation}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\LibUR\Pooling">
+      <UniqueIdentifier>{LibUR_Pooling}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\LibUR\Pooling\Auxiliary">
+      <UniqueIdentifier>{LibUR_Pooling_Auxiliary}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\LibUR\Pooling\Queues">
+      <UniqueIdentifier>{LibUR_Pooling_Queues}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\TestScenesAssets">
+      <UniqueIdentifier>{TestScenesAssets}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\TestScenesAssets\InstantiatorTesting">
+      <UniqueIdentifier>{TestScenesAssets_InstantiatorTesting}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\TestScenesAssets\PoolTesting">
+      <UniqueIdentifier>{TestScenesAssets_PoolTesting}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\TestScenesAssets\PoolTesting\Generators">
+      <UniqueIdentifier>{TestScenesAssets_PoolTesting_Generators}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\TestScenesAssets\PoolTesting\Sphere">
+      <UniqueIdentifier>{TestScenesAssets_PoolTesting_Sphere}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\LibUR\Instantiation\InstantiatorFactory.cs">
+      <Filter>Assets\LibUR\Instantiation</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Delegates\WrappedActionClasses.cs">
+      <Filter>Assets\LibUR\Delegates</Filter>
+    </Compile>
+    <Compile Include="Assets\TestScenesAssets\PoolTesting\Sphere\SphereGM.cs">
+      <Filter>Assets\TestScenesAssets\PoolTesting\Sphere</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Pooling\Auxiliary\PoolCreationDataBuilder.cs">
+      <Filter>Assets\LibUR\Pooling\Auxiliary</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Pooling\PoolFixed.cs">
+      <Filter>Assets\LibUR\Pooling</Filter>
+    </Compile>
+    <Compile Include="Assets\TestScenesAssets\PoolTesting\Generators\Generator_Flexible.cs">
+      <Filter>Assets\TestScenesAssets\PoolTesting\Generators</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Pooling\Queues\QueueRandomized.cs">
+      <Filter>Assets\LibUR\Pooling\Queues</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Pooling\Auxiliary\PoolHelper.cs">
+      <Filter>Assets\LibUR\Pooling\Auxiliary</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Pooling\Auxiliary\SPoolCreationData.cs">
+      <Filter>Assets\LibUR\Pooling\Auxiliary</Filter>
+    </Compile>
+    <Compile Include="Assets\TestScenesAssets\InstantiatorTesting\InfoToPass.cs">
+      <Filter>Assets\TestScenesAssets\InstantiatorTesting</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Instantiation\IInitializable.cs">
+      <Filter>Assets\LibUR\Instantiation</Filter>
+    </Compile>
+    <Compile Include="Assets\TestScenesAssets\PoolTesting\Sphere\Timeout_Disable.cs">
+      <Filter>Assets\TestScenesAssets\PoolTesting\Sphere</Filter>
+    </Compile>
+    <Compile Include="Assets\TestScenesAssets\PoolTesting\Generators\Generator_Fixed_MO.cs">
+      <Filter>Assets\TestScenesAssets\PoolTesting\Generators</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\GameStates\GameStateObserver.cs">
+      <Filter>Assets\LibUR\GameStates</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Pooling\Queues\IQueue.cs">
+      <Filter>Assets\LibUR\Pooling\Queues</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\GameStates\IGameStateObserver.cs">
+      <Filter>Assets\LibUR\GameStates</Filter>
+    </Compile>
+    <Compile Include="Assets\TestScenesAssets\InstantiatorTesting\Instantiator.cs">
+      <Filter>Assets\TestScenesAssets\InstantiatorTesting</Filter>
+    </Compile>
+    <Compile Include="Assets\TestScenesAssets\PoolTesting\Sphere\Timeout_Kill.cs">
+      <Filter>Assets\TestScenesAssets\PoolTesting\Sphere</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Delegates\WrappedFuncClasses.cs">
+      <Filter>Assets\LibUR\Delegates</Filter>
+    </Compile>
+    <Compile Include="Assets\TestScenesAssets\InstantiatorTesting\TheCube.cs">
+      <Filter>Assets\TestScenesAssets\InstantiatorTesting</Filter>
+    </Compile>
+    <Compile Include="Assets\TestScenesAssets\PoolTesting\Generators\PoolingInfo.cs">
+      <Filter>Assets\TestScenesAssets\PoolTesting\Generators</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Pooling\Queues\QueueOrdered.cs">
+      <Filter>Assets\LibUR\Pooling\Queues</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Pooling\PoolFlexible.cs">
+      <Filter>Assets\LibUR\Pooling</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Pooling\Auxiliary\IPool.cs">
+      <Filter>Assets\LibUR\Pooling\Auxiliary</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\Pooling\PoolFixed_MultipleObjects.cs">
+      <Filter>Assets\LibUR\Pooling</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\GameStates\GameState.cs">
+      <Filter>Assets\LibUR\GameStates</Filter>
+    </Compile>
+    <Compile Include="Assets\LibUR\GameStates\SubscriberData.cs">
+      <Filter>Assets\LibUR\GameStates</Filter>
+    </Compile>
+    <Compile Include="Assets\TestScenesAssets\PoolTesting\Generators\Generator_Fixed.cs">
+      <Filter>Assets\TestScenesAssets\PoolTesting\Generators</Filter>
+    </Compile>
+  </ItemGroup>
+</Project>
+
+
