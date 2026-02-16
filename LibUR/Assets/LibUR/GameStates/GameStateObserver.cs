@@ -1,20 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace LibUR.GameStates
 {
-    public class GameStateObserver : IGameStateObserver
+    public class GameStateObserver<T> : IGameStateObserver<T> where T : Enum
     {
-        private readonly Dictionary<GameState, List<SubscriberData>> _subscribers;
-        public Dictionary<GameState, List<SubscriberData>> Subscribers => _subscribers;
+        private readonly Dictionary<T, List<SubscriberData>> _subscribers;
+        public Dictionary<T, List<SubscriberData>> Subscribers => _subscribers;
 
         public GameStateObserver()
         {
-            _subscribers = new Dictionary<GameState, List<SubscriberData>>();
+            _subscribers = new Dictionary<T, List<SubscriberData>>();
         }
 
-        public void Subscribe(GameState state, Action action, string subscriberName)
+        public void Subscribe(T state, Action action, string subscriberName)
         {
             if (_subscribers.ContainsKey(state))
             {
@@ -33,7 +33,7 @@ namespace LibUR.GameStates
                 _subscribers.Add(state, new List<SubscriberData> { new SubscriberData(subscriberName, action) });
         }
 
-        public void Unsubscribe(GameState state, string subscriberName)
+        public void Unsubscribe(T state, string subscriberName)
         {
             if (!_subscribers.ContainsKey(state))
                 return;
@@ -47,16 +47,13 @@ namespace LibUR.GameStates
                 state.Value.RemoveAll(x => x.Name.Equals(subscriberName, StringComparison.OrdinalIgnoreCase));
         }
 
-        public void Fire(GameState state)
+        public void Fire(T state)
         {
-            foreach (var st in _subscribers)
-            {
-                if (!st.Key.Equals(state))
-                    continue;
+            if (!_subscribers.TryGetValue(state, out var list))
+                return;
 
-                foreach (var subscriber in st.Value)
-                    subscriber.Action?.Invoke();
-            }
+            foreach (var subscriber in list)
+                subscriber.Action?.Invoke();
         }
 
         public void Clear()

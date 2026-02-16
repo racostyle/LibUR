@@ -1,4 +1,5 @@
-﻿using LibUR.Pooling.Auxiliary;
+using System;
+using LibUR.Pooling.Auxiliary;
 using LibUR.Pooling.Queues;
 using UnityEngine;
 
@@ -26,6 +27,11 @@ namespace LibUR.Pooling
         /// <param name="reference">The GameObject prefab to instantiate for all pooled objects</param>
         public PoolFixed(in IPoolCreationData<T> data, IQueue queue, GameObject reference)
         {
+            if (reference == null)
+                throw new ArgumentNullException(nameof(reference));
+            if (!reference.TryGetComponent<T>(out _))
+                throw new ArgumentException($"Prefab '{reference.name}' must have a {typeof(T).Name} component.", nameof(reference));
+
             _data = data;
             _queue = queue;
             _pooledObjects = new T[_data.Size];
@@ -43,10 +49,11 @@ namespace LibUR.Pooling
         {
             for (int index = 0; index < size; index++)
             {
-                var obj = Object.Instantiate(reference, Vector3.zero, Quaternion.identity, _container.transform);
+                var obj = UnityEngine.Object.Instantiate(reference, Vector3.zero, Quaternion.identity, _container.transform);
                 if (!obj.TryGetComponent<T>(out var component))
                 {
-                    Debug.Log($"{component} could not be found!");
+                    Debug.LogWarning($"{typeof(T).Name} could not be found on {reference.name}. Skipping.");
+                    UnityEngine.Object.Destroy(obj);
                     continue;
                 }
 

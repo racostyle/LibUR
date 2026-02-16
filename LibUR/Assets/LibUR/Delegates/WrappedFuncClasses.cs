@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace LibUR.Delegates
 {
@@ -14,6 +14,8 @@ namespace LibUR.Delegates
 
         public TX Invoke()
         {
+            if (_func == null)
+                throw new InvalidOperationException("No delegate registered. Call Register before Invoke.");
             return _func.Invoke();
         }
     }
@@ -30,6 +32,8 @@ namespace LibUR.Delegates
 
         public TX Invoke(T1 arg1)
         {
+            if (_func == null)
+                throw new InvalidOperationException("No delegate registered. Call Register before Invoke.");
             return _func.Invoke(arg1);
         }
     }
@@ -46,6 +50,8 @@ namespace LibUR.Delegates
 
         public TX Invoke(T1 arg1, T2 arg2)
         {
+            if (_func == null)
+                throw new InvalidOperationException("No delegate registered. Call Register before Invoke.");
             return _func.Invoke(arg1, arg2);
         }
     }
@@ -62,6 +68,8 @@ namespace LibUR.Delegates
 
         public TX Invoke(T1 arg1, T2 arg2, T3 arg3)
         {
+            if (_func == null)
+                throw new InvalidOperationException("No delegate registered. Call Register before Invoke.");
             return _func.Invoke(arg1, arg2, arg3);
         }
     }
@@ -78,6 +86,8 @@ namespace LibUR.Delegates
 
         public TX Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
+            if (_func == null)
+                throw new InvalidOperationException("No delegate registered. Call Register before Invoke.");
             return _func.Invoke(arg1, arg2, arg3, arg4);
         }
     }
@@ -94,6 +104,8 @@ namespace LibUR.Delegates
 
         public TX Invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
         {
+            if (_func == null)
+                throw new InvalidOperationException("No delegate registered. Call Register before Invoke.");
             return _func.Invoke(arg1, arg2, arg3, arg4, arg5);
         }
     }

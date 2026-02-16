@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace LibUR.GameStates
 {
-    public interface IGameStateObserver
+    public interface IGameStateObserver<T> where T : Enum
     {
-        Dictionary<GameState, List<SubscriberData>> Subscribers { get; }
-        void Subscribe(GameState state, Action action, string subscriberName);
-        void Unsubscribe(GameState state, string subscriberName);
+        Dictionary<T, List<SubscriberData>> Subscribers { get; }
+        void Subscribe(T state, Action action, string subscriberName);
+        void Unsubscribe(T state, string subscriberName);
         void Unsubscribe(string subscriberName);
-        void Fire(GameState state);
+        void Fire(T state);
         void Clear();
     }
 }

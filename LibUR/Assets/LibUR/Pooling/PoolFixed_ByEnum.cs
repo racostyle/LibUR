@@ -21,12 +21,10 @@ namespace LibUR.Pooling
 
         /// <summary>
         /// Creates a pool that allows selection by enum value.
-        /// Each enum value maps to its own separate pool of objects.
-        /// The pool size for each enum type is determined by the ObjectDistribution array in the pool creation data.
         /// </summary>
-        /// <param name="data">Pool creation data containing ObjectDistribution array and other settings</param>
-        /// <param name="references">Dictionary mapping enum values to GameObject references. Keys must match the order in ObjectDistribution.</param>
-        /// <exception cref="ArgumentNullException">Thrown when references is null</exception>
+        /// <param name="data">Pool creation data</param>
+        /// <param name="references">Dictionary mapping enum values to GameObject references</param>
+        /// <param name="sizes">Dictionary mapping enum values to pool sizes for each enum</param>
         public PoolFixed_ByEnum(
             in IPoolCreationData<T> data,
             Dictionary<TEnum, GameObject> references)
@@ -36,6 +34,15 @@ namespace LibUR.Pooling
             if (references == null)
                 throw new ArgumentNullException(nameof(references));
 
+            foreach (var kvp in references)
+            {
+                var refPrefab = kvp.Value;
+                if (refPrefab == null)
+                    throw new ArgumentException($"Reference for enum {kvp.Key} is null.", nameof(references));
+                if (!refPrefab.TryGetComponent<T>(out _))
+                    throw new ArgumentException($"Prefab '{refPrefab.name}' for enum {kvp.Key} must have a {typeof(T).Name} component.", nameof(references));
+            }
+
             _pooledObjects = new Dictionary<TEnum, T[]>();
 
             _helper = new PoolHelper<T>();
@@ -44,11 +51,6 @@ namespace LibUR.Pooling
             PopulatePool(references);
         }
 
-        /// <summary>
-        /// Populates the pool by instantiating objects for each enum value according to ObjectDistribution.
-        /// For each enum value in the references dictionary, creates the number of objects specified in ObjectDistribution at the corresponding index.
-        /// </summary>
-        /// <param name="references">Dictionary mapping enum values to GameObject references</param>
         private void PopulatePool(Dictionary<TEnum, GameObject> references)
         {
             int globalIndex = 0;
@@ -81,17 +83,15 @@ namespace LibUR.Pooling
         }
 
         /// <summary>
-        /// Attempts to activate an object of a specific enum type from the pool at the specified position.
-        /// Searches for the first inactive object in the specified enum's pool and activates it.
-        /// Returns false if no objects of that enum type are available.
+        /// Attempts to activate an object of a specific enum type from the pool.
         /// </summary>
-        /// <param name="position">World position where the object should be activated</param>
-        /// <param name="key">The enum value specifying which pool to select from</param>
-        /// <param name="obj">The activated object, or default if no object of that type was available</param>
-        /// <returns>True if an object was successfully activated, false if the pool for that enum type is exhausted</returns>
+        /// <param name="enumValue">The enum value to select from</param>
+        /// <param name="position">Position to activate the object at</param>
+        /// <param name="obj">The activated object, or null if unavailable</param>
+        /// <returns>True if an object was successfully activated, false otherwise</returns>
         public bool TryActivateObject(Vector3 position, TEnum key, out T obj)
         {
-            if (!_pooledObjects.TryGetValue(key, out var array))
+            if (!_pooledObjects.TryGetValue(key, out var array) || array == null)
             {
                 obj = default;
                 return false;
@@ -99,7 +99,7 @@ namespace LibUR.Pooling
 
             foreach (var item in array)
             {
-                if (item != null && !item.gameObject.activeInHierarchy)
+                if (!item.gameObject.activeInHierarchy)
                 {
                     obj = _helper.ActivateObject(item, position, _data.EnableAction);
                     return true;
@@ -111,17 +111,11 @@ namespace LibUR.Pooling
         }
 
         /// <summary>
-        /// Two-step activation: selects an object of a specific enum type from the pool without activating it.
-        /// Searches for the first inactive object in the specified enum's pool.
-        /// Use this when you need to perform additional setup before activating the object.
-        /// Follow with TwoStep_EnableObject to activate the selected object.
+        /// Two-step activation: selects and dequeues an object from the global pool.
         /// </summary>
-        /// <param name="key">The enum value specifying which pool to select from</param>
-        /// <param name="obj">The selected object, or default if no inactive object of that type was available</param>
-        /// <returns>True if an object was successfully selected, false if the pool for that enum type is exhausted</returns>
         public bool TwoStep_TrySelectObject(TEnum key, out T obj)
         {
-            if (!_pooledObjects.TryGetValue(key, out var array))
+            if (!_pooledObjects.TryGetValue(key, out var array) || array == null)
             {
                 obj = default;
                 return false;
@@ -129,7 +123,7 @@ namespace LibUR.Pooling
 
             foreach (var item in array)
             {
-                if (item != null && !item.gameObject.activeInHierarchy)
+                if (!item.gameObject.activeInHierarchy)
                 {
                     obj = item;
                     return true;
@@ -141,37 +135,36 @@ namespace LibUR.Pooling
         }
 
         /// <summary>
-        /// Two-step activation: activates a previously selected object at the specified position.
-        /// Call this after TwoStep_TrySelectObject to complete the activation.
+        /// Two-step activation: enables a previously selected object.
         /// </summary>
-        /// <param name="position">World position where the object should be activated</param>
-        /// <param name="obj">The object to activate (previously selected via TwoStep_TrySelectObject)</param>
         public void TwoStep_EnableObject(Vector3 position, T obj)
         {
             _helper.ActivateObject(obj, position, _data.EnableAction);
         }
 
         /// <summary>
-        /// Gets all pooled objects organized by enum type.
-        /// Returns a dictionary where each key is an enum value and the value is an array of pooled objects for that enum type.
+        /// Gets all pooled objects.
         /// </summary>
-        /// <returns>Dictionary mapping enum values to arrays of pooled objects</returns>
         public Dictionary<TEnum, T[]> GetPool()
         {
             return _pooledObjects;
         }
 
         /// <summary>
-        /// Destroys all pooled objects across all enum types and optionally the container GameObject.
-        /// Iterates through all enum pools and destroys their objects, then optionally destroys the container.
-        /// Use this for cleanup when the pool is no longer needed (e.g., on scene unload or game shutdown).
+        /// Destroys all pooled objects and optionally the container.
         /// </summary>
-        /// <param name="alsoDestroyContainer">If true, also destroys the container GameObject that holds all pooled objects</param>
         public void DestroyAll(bool alsoDestroyContainer = true)
         {
             foreach (var item in _pooledObjects)
+                _helper.DestroyAll(item.Value, null);
+
+            if (alsoDestroyContainer && _container != null)
             {
-                _helper.DestroyAll(item.Value, alsoDestroyContainer ? _container : null);
+                if (Application.isPlaying)
+                    UnityEngine.Object.Destroy(_container);
+                else
+                    UnityEngine.Object.DestroyImmediate(_container);
+                _container = null;
             }
         }
     }

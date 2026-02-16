@@ -59,12 +59,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\LibUR\Pooling\Auxiliary\IPoolCreationData.cs" />
+    <Compile Include="Assets\LibUR\Auxiliary\UniqueSessionId.cs" />
+    <Compile Include="Assets\LibUR\Auxiliary\RayCaster.cs" />
     <Compile Include="Assets\TestScenesAssets\PoolTesting\Generators\Generator_Fixed_MO.cs" />
     <Compile Include="Assets\LibUR\Pooling\PoolFixed_MultipleObjects.cs" />
-    <Compile Include="Assets\LibUR\GameStates\GameState.cs" />
     <Compile Include="Assets\TestScenesAssets\PoolTesting\Sphere\SphereGM.cs" />
     <Compile Include="Assets\LibUR\Pooling\Queues\IQueue.cs" />
     <Compile Include="Assets\LibUR\GameStates\IGameStateObserver.cs" />
+    <Compile Include="Assets\LibUR\Auxiliary\FrameThrottle.cs" />
     <Compile Include="Assets\TestScenesAssets\InstantiatorTesting\Instantiator.cs" />
     <Compile Include="Assets\LibUR\Pooling\Auxiliary\PoolCreationDataBuilder.cs" />
     <Compile Include="Assets\LibUR\Delegates\WrappedFuncClasses.cs" />

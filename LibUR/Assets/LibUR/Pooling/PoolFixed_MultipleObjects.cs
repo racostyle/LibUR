@@ -1,4 +1,5 @@
-﻿using LibUR.Pooling.Auxiliary;
+using System;
+using LibUR.Pooling.Auxiliary;
 using LibUR.Pooling.Queues;
 using UnityEngine;
 
@@ -35,7 +36,16 @@ namespace LibUR.Pooling
             _helper = new PoolHelper<T>(_queue);
 
             if (references.Length != _data.ObjectDistribution.Length)
-                throw new System.Exception("ObjectRef must match ObjectDistribution length");
+                throw new ArgumentException("References array length must match ObjectDistribution length.", nameof(references));
+
+            for (int i = 0; i < references.Length; i++)
+            {
+                var refPrefab = references[i];
+                if (refPrefab == null)
+                    throw new ArgumentException($"References[{i}] is null.", nameof(references));
+                if (!refPrefab.TryGetComponent<T>(out _))
+                    throw new ArgumentException($"Prefab '{refPrefab.name}' at index {i} must have a {typeof(T).Name} component.", nameof(references));
+            }
 
             _container = _helper.CreateLocalContainer(_data.PoolName, _data.ParentContainer);
             PopulatePool(references, _data.Size);
@@ -53,10 +63,11 @@ namespace LibUR.Pooling
             {
                 for (int specificObjectCounter = 0; specificObjectCounter < _data.ObjectDistribution[objectTypeIndex]; specificObjectCounter++)
                 {
-                    var obj = Object.Instantiate(references[objectTypeIndex], Vector3.zero, Quaternion.identity, _container.transform);
+                    var obj = UnityEngine.Object.Instantiate(references[objectTypeIndex], Vector3.zero, Quaternion.identity, _container.transform);
                     if (!obj.TryGetComponent<T>(out var component))
                     {
-                        Debug.Log($"{component} could not be found!");
+                        Debug.LogWarning($"{typeof(T).Name} could not be found on {references[objectTypeIndex].name}. Skipping.");
+                        UnityEngine.Object.Destroy(obj);
                         continue;
                     }
 
