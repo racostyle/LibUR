@@ -58,38 +58,15 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.62f3\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\LibUR\Pooling\Auxiliary\IPoolCreationData.cs" />
-    <Compile Include="Assets\LibUR\Auxiliary\UniqueSessionId.cs" />
-    <Compile Include="Assets\LibUR\Auxiliary\RayCaster.cs" />
     <Compile Include="Assets\TestScenesAssets\PoolTesting\Generators\Generator_Fixed_MO.cs" />
-    <Compile Include="Assets\LibUR\Pooling\PoolFixed_MultipleObjects.cs" />
     <Compile Include="Assets\TestScenesAssets\PoolTesting\Sphere\SphereGM.cs" />
-    <Compile Include="Assets\LibUR\Pooling\Queues\IQueue.cs" />
-    <Compile Include="Assets\LibUR\GameStates\IGameStateObserver.cs" />
-    <Compile Include="Assets\LibUR\Auxiliary\FrameThrottle.cs" />
     <Compile Include="Assets\TestScenesAssets\InstantiatorTesting\Instantiator.cs" />
-    <Compile Include="Assets\LibUR\Pooling\Auxiliary\PoolCreationDataBuilder.cs" />
-    <Compile Include="Assets\LibUR\Delegates\WrappedFuncClasses.cs" />
     <Compile Include="Assets\TestScenesAssets\PoolTesting\Generators\Generator_Fixed.cs" />
-    <Compile Include="Assets\LibUR\Pooling\PoolFixed.cs" />
-    <Compile Include="Assets\LibUR\Pooling\Auxiliary\PoolHelper.cs" />
-    <Compile Include="Assets\LibUR\GameStates\GameStateObserver.cs" />
-    <Compile Include="Assets\LibUR\Instantiation\InstantiatorFactory.cs" />
     <Compile Include="Assets\TestScenesAssets\PoolTesting\Generators\Generator_Flexible.cs" />
-    <Compile Include="Assets\LibUR\Delegates\WrappedActionClasses.cs" />
-    <Compile Include="Assets\LibUR\Pooling\Auxiliary\IPoolByEnum.cs" />
-    <Compile Include="Assets\LibUR\GameStates\SubscriberData.cs" />
-    <Compile Include="Assets\LibUR\Pooling\Auxiliary\SPoolCreationData.cs" />
     <Compile Include="Assets\TestScenesAssets\InstantiatorTesting\InfoToPass.cs" />
-    <Compile Include="Assets\LibUR\Instantiation\IInitializable.cs" />
     <Compile Include="Assets\TestScenesAssets\InstantiatorTesting\TheCube.cs" />
-    <Compile Include="Assets\LibUR\Pooling\PoolFixed_ByEnum.cs" />
     <Compile Include="Assets\TestScenesAssets\PoolTesting\Generators\PoolingInfo.cs" />
-    <Compile Include="Assets\LibUR\Pooling\Queues\QueueRandomized.cs" />
-    <Compile Include="Assets\LibUR\Pooling\Queues\QueueOrdered.cs" />
-    <Compile Include="Assets\LibUR\Pooling\PoolFlexible.cs" />
     <Compile Include="Assets\TestScenesAssets\PoolTesting\Sphere\Timeout_Disable.cs" />
-    <Compile Include="Assets\LibUR\Pooling\Auxiliary\IPool.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -712,6 +689,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="LibUR.csproj">
+      <Project>{FF390517-5B74-2B93-ECC9-B72B10DD295B}</Project>
+      <Name>LibUR</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

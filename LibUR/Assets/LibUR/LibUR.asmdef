@@ -1,0 +1,17 @@
+{
+    "name": "LibUR",
+    "rootNamespace": "LibUR",
+    "references": [
+        "UnityEngine.CoreModule",
+        "UnityEngine.PhysicsModule"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
