@@ -61,10 +61,10 @@ Below are the major systems included:
 ## **4. Safe Delegate Wrappers (LibUR.Delegates)**
 
 - **Purpose:**  
-  Provide safe, single-assignment wrappers for Actions and Funcs to prevent delegate misuse.
+  Provide safe, single-assignment wrappers for Funcs to prevent delegate misuse.
 
 - **Highlights:**
-  - Strongly typed wrappers for Actions (void returns) and Funcs (value returns).
+  - Strongly typed wrappers for Funcs (value returns).
   - Only allows a delegate to be registered once.
   - Safe invocation without risk of null references.
 

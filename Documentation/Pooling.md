@@ -60,11 +60,11 @@ public interface IPoolByEnum<T, TEnum>
 
 ---
 
-### **SPoolCreationData<T>**
+### **PoolCreationData<T>**
 
-Located in `SPoolCreationData.cs`
+Located in `IPoolCreationData.cs`
 
-Immutable struct holding all pool configuration data:
+Struct holding all pool configuration data. Pool constructors take it as `in PoolCreationData<T>`:
 
 | Field                | Description                                | Used By                    |
 | -------------------- | ------------------------------------------ | -------------------------- |
@@ -82,7 +82,7 @@ Immutable struct holding all pool configuration data:
 
 Located in `PoolCreationDataBuilder.cs`
 
-Fluent builder for constructing a `SPoolCreationData<T>` instance using method chaining.
+Fluent builder for constructing a `PoolCreationData<T>` instance using method chaining.
 
 **Available Methods:**
 
@@ -101,7 +101,7 @@ var data = new PoolCreationDataBuilder<Bullet>("Bullets")
 
 - **SetDistribution_Manual(params int[])** — Manually specify counts for each object type (e.g., `[50, 50, 20]` creates 50 of first, 50 of second, 20 of third).
 - **SetDistribution_Fixed(int objectsCount, int value)** — Each object type gets the same count (e.g., `SetDistribution_Fixed(3, 50)` creates `[50, 50, 50]`).
-- **SetDistribution_AutoCalculate(int totalSize, int objectsCount)** — Automatically calculates weighted distribution (first gets 50%, others get decreasing shares). Requires at least 3 object types and minimum size of `objectsCount * 5`.
+- **SetDistribution_AutoCalculate(int totalSize, int objectsCount)** — Splits `totalSize` across `objectsCount` types. Requires at least 2 object types.
 
 ---
 
@@ -441,6 +441,6 @@ if (pool.TwoStep_TrySelectAndDequeueObject(out var obj))
 
 ## 📚 Related Documentation
 
-- See `Delegates.md` for information on action/func wrapper classes used in pool initialization.
+- See `Delegates.md` for information on func wrapper classes used in pool initialization.
 - See `GameState.md` for state management that can coordinate pool lifecycle.
 - See `Instantiation.md` for alternative object creation patterns.

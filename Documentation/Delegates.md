@@ -1,16 +1,16 @@
-# Action and Delegate Wrapper Classes
+# Func Delegate Wrapper Classes
 
-This mediator system uses custom `WrappedAction` and `WrappedFunc` classes where each delegate can **only be registered once** and can then be **invoked by multiple classes**.
+This mediator system uses custom `WrappedFunc` classes where each delegate can **only be registered once** and can then be **invoked by multiple classes**.
 
 The following outlines **why this approach is often better than using traditional events or observer patterns**:
 
 ---
 
-### **Benefits of the `WrappedAction` / `WrappedFunc` Approach over Events/Observers**
+### **Benefits of the `WrappedFunc` Approach over Events/Observers**
 
 1. **Strict Single Assignment (Single Responsibility)**
 
-   - With `WrappedAction` or `WrappedFunc`, only **one** method can be registered.
+   - With `WrappedFunc`, only **one** method can be registered.
    - This design **avoids unexpected multi-subscriber behavior** that occurs with standard C# events or observer patterns, where **multiple handlers** may subscribe accidentally, leading to duplicated execution, memory leaks, or race conditions.
 
 2. **Controlled Setup Phase**
@@ -20,13 +20,13 @@ The following outlines **why this approach is often better than using traditiona
 
 3. **Clear Failures and Easy Debugging**
 
-   - If no method is registered, the `Invoke()` method safely does nothing (`_action?.Invoke()`), avoiding unexpected exceptions or bugs caused by null event handlers.
+   - If no method is registered, `Invoke()` throws `InvalidOperationException`, so a missing registration fails immediately instead of returning a default value.
    - It is easier to track **which component is responsible** for specific logic because there is **only one registered method** per delegate.
 
 4. **Loose Coupling Between Classes**
 
    - Classes that need to invoke functionality **do not need to know** who implements it.
-   - They interact only with the `WrappedAction` or `WrappedFunc`, leading to an **architecture that is modular and testable** without tight dependencies.
+   - They interact only with the `WrappedFunc`, leading to an **architecture that is modular and testable** without tight dependencies.
 
 5. **Avoidance of "Event Storms"**
 
@@ -35,7 +35,7 @@ The following outlines **why this approach is often better than using traditiona
 
 6. **Fine-Grained Control**
 
-   - The `WrappedAction` and `WrappedFunc` classes can be **easily extended** with additional features such as "replace registered action," "clear registered action," or "invoke with fallback" behavior.
+   - The `WrappedFunc` classes can be **easily extended** with additional features such as "replace registered function," "clear registered function," or "invoke with fallback" behavior.
    - Traditional events often require a more complex custom event manager to achieve a similar level of control.
 
 7. **Simplified Lifetime Management**
@@ -66,7 +66,6 @@ Essentially, this design implements a **"Single-Slot Mediator"** pattern—a cle
 
 ## Features
 
-- **WrappedAction**: Simplifies the registration and invocation of `Action` delegates with up to six parameters.
 - **WrappedFunc**: Manages `Func` delegates, supporting up to five input parameters and one return type.
 - **ManagerDelegate**: Provides an example of how to use the wrapper classes to manage and invoke actions within a manager class.
 
@@ -82,49 +81,28 @@ Essentially, this design implements a **"Single-Slot Mediator"** pattern—a cle
 
 ### Usage
 
-#### Registering an Action
+#### Registering a Func
 
-To register an action, use the `Register` method of the `WrappedAction` class.
+To register a function, use the `Register` method of the `WrappedFunc` class.
 
 ```csharp
-var wrappedAction = new ActionWrapperClasses.WrappedAction<string, string>();
-wrappedAction.Register(MyActionMethod);
+var wrappedFunc = new WrappedFunc<string, string, bool>();
+wrappedFunc.Register(MyFuncMethod);
 
-void MyActionMethod(string arg1, string arg2)
+bool MyFuncMethod(string arg1, string arg2)
 {
-    // Your logic here
+    return true;
 }
 ```
 
-#### Invoking an Action
+#### Invoking a Func
 
-Once registered, you can invoke the action using the `Invoke` method.
-
-```csharp
-wrappedAction.Invoke("arg1", "arg2");
-```
-
-#### Using ManagerDelegate
-
-The `ManagerDelegate` class demonstrates how to use the wrapper classes to manage actions within a manager.
+Once registered, you can invoke the function using the `Invoke` method.
 
 ```csharp
-var manager = new Managers.ManagerDelegate();
-manager.Example.Register(MyActionMethod);
+bool result = wrappedFunc.Invoke("arg1", "arg2");
 ```
 
 ### Files Overview
 
-- **ActionWrapperClasses.cs**: Contains classes for wrapping `Action` delegates with varying numbers of parameters.
-- **DelegateWrapperClasses.cs**: Contains classes for wrapping `Func` delegates, allowing for return types and multiple input parameters.
-- **ManagerDelegate.cs**: Example class showing how to use the wrapped actions in a management scenario.
-
-### Example
-
-```csharp
-// Example usage in a Manager class
-var manager = new Managers.ManagerDelegate();
-manager.Example.Register((arg1, arg2) => {
-    //Method
-});
-```
+- **WrappedFuncClasses.cs**: Contains classes for wrapping `Func` delegates, allowing for return types and multiple input parameters.
