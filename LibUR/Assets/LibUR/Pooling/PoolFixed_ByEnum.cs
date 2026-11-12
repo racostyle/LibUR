@@ -17,7 +17,7 @@ namespace LibUR.Pooling
         private PoolHelper<T> _helper;
         private GameObject _container;
         private Dictionary<TEnum, T[]> _pooledObjects;
-        private IPoolCreationData<T> _data;
+        private PoolCreationData<T> _data;
 
         /// <summary>
         /// Creates a pool that allows selection by enum value.
@@ -26,7 +26,7 @@ namespace LibUR.Pooling
         /// <param name="references">Dictionary mapping enum values to GameObject references</param>
         /// <param name="sizes">Dictionary mapping enum values to pool sizes for each enum</param>
         public PoolFixed_ByEnum(
-            in IPoolCreationData<T> data,
+            in PoolCreationData<T> data,
             Dictionary<TEnum, GameObject> references)
         {
             _data = data;

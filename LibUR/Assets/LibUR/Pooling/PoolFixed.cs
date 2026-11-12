@@ -16,7 +16,7 @@ namespace LibUR.Pooling
         private readonly PoolHelper<T> _helper;
         private readonly GameObject _container;
         private T[] _pooledObjects;
-        private IPoolCreationData<T> _data;
+        private PoolCreationData<T> _data;
         private IQueue _queue;
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace LibUR.Pooling
         /// <param name="data">Pool creation data containing size, parent container, and initialization actions</param>
         /// <param name="queue">Queue implementation for managing object selection order</param>
         /// <param name="reference">The GameObject prefab to instantiate for all pooled objects</param>
-        public PoolFixed(in IPoolCreationData<T> data, IQueue queue, GameObject reference)
+        public PoolFixed(in PoolCreationData<T> data, IQueue queue, GameObject reference)
         {
             if (reference == null)
                 throw new ArgumentNullException(nameof(reference));

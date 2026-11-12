@@ -45,9 +45,6 @@
     <Compile Include="Assets\LibUR\Instantiation\InstantiatorFactory.cs">
       <Filter>Assets\LibUR\Instantiation</Filter>
     </Compile>
-    <Compile Include="Assets\LibUR\Delegates\WrappedActionClasses.cs">
-      <Filter>Assets\LibUR\Delegates</Filter>
-    </Compile>
     <Compile Include="Assets\TestScenesAssets\PoolTesting\Sphere\SphereGM.cs">
       <Filter>Assets\TestScenesAssets\PoolTesting\Sphere</Filter>
     </Compile>
@@ -64,9 +61,6 @@
       <Filter>Assets\LibUR\Pooling\Queues</Filter>
     </Compile>
     <Compile Include="Assets\LibUR\Pooling\Auxiliary\PoolHelper.cs">
-      <Filter>Assets\LibUR\Pooling\Auxiliary</Filter>
-    </Compile>
-    <Compile Include="Assets\LibUR\Pooling\Auxiliary\SPoolCreationData.cs">
       <Filter>Assets\LibUR\Pooling\Auxiliary</Filter>
     </Compile>
     <Compile Include="Assets\TestScenesAssets\InstantiatorTesting\InfoToPass.cs">

@@ -63,8 +63,11 @@
     <Compile Include="Assets\Tests\Editor\PoolFixedPlayModeTests.cs" />
     <Compile Include="Assets\Tests\Editor\QueueRandomizedTests.cs" />
     <Compile Include="Assets\Tests\Editor\RayCasterTests.cs" />
+    <Compile Include="Assets\Tests\Editor\EventBusTests.cs" />
+    <Compile Include="Assets\Tests\Editor\SignalBusTests.cs" />
+    <Compile Include="Assets\Tests\Editor\ExtensionsTests.cs" />
+    <Compile Include="Assets\Tests\Editor\LoggerFactoryTests.cs" />
     <Compile Include="Assets\Tests\Editor\GameStateObserverTests.cs" />
-    <Compile Include="Assets\Tests\Editor\WrappedActionTests.cs" />
     <Compile Include="Assets\Tests\Editor\FrameThrottleTests.cs" />
     <Compile Include="Assets\Tests\Editor\SessionObjectIdTests.cs" />
     <Compile Include="Assets\Tests\Editor\WrappedFuncTests.cs" />

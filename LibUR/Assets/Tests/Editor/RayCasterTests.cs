@@ -1,5 +1,5 @@
 using UnityEngine;
-using LibUR.Auxiliary;
+using Assets.LibUR.Auxiliary;
 using NUnit.Framework;
 
 namespace LibUR.Tests

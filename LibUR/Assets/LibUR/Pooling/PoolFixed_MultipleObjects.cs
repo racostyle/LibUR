@@ -17,7 +17,7 @@ namespace LibUR.Pooling
         private readonly PoolHelper<T> _helper;
         private GameObject _container;
         private T[] _pooledObjects;
-        private IPoolCreationData<T> _data;
+        private PoolCreationData<T> _data;
         private IQueue _queue;
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace LibUR.Pooling
         /// <param name="queue">Queue implementation for managing object selection order</param>
         /// <param name="references">Array of GameObject prefabs to instantiate. Length must match ObjectDistribution length.</param>
         /// <exception cref="System.Exception">Thrown when references array length doesn't match ObjectDistribution length</exception>
-        public PoolFixed_MultipleObjects(in IPoolCreationData<T> data, IQueue queue, GameObject[] references)
+        public PoolFixed_MultipleObjects(in PoolCreationData<T> data, IQueue queue, GameObject[] references)
         {
             _data = data;
             _queue = queue;

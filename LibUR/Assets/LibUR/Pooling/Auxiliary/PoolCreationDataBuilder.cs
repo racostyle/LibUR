@@ -67,50 +67,20 @@ namespace LibUR.Pooling.Auxiliary
 
         public PoolCreationDataBuilder<T> SetDistribution_AutoCalculate(int totalSize, int objectsCount)
         {
-            if (objectsCount < 3)
-                throw new ArgumentException("Distributed array should contain at least 3 different objects");
-
-            var expectedMinimumSize = objectsCount * 5;
-            if (totalSize < expectedMinimumSize)
-                throw new ArgumentException($"Expected minimum total size of total objects in distributed array should be at least {expectedMinimumSize}");
+            if (objectsCount < 2)
+                throw new ArgumentException("Distribution requires at least 2 object types");
 
             _size = totalSize;
             _objectDistribution = new int[objectsCount];
 
-            double distribution_value = totalSize / 2;
-
-            //first
-            _objectDistribution[0] = (int)distribution_value;
-            //middle
-            for (int i = 1; i < objectsCount - 1; i++)
+            int remaining = totalSize;
+            for (int i = 0; i < objectsCount - 1; i++)
             {
-                var local = Math.Ceiling(distribution_value * .6f);
-                distribution_value -= local;
-                _objectDistribution[i] = (int)local;
+                int share = Math.Max(1, remaining / (objectsCount - i));
+                _objectDistribution[i] = share;
+                remaining -= share;
             }
-            //last
-            _objectDistribution[objectsCount - 1] = distribution_value < 0 ? 1 : (int)distribution_value;
-            //size safetycheck
-            while (totalSize > _objectDistribution.Sum())
-            {
-                DecreaseDistribution(0);
-            }
-
-            void DecreaseDistribution(int index)
-            {
-                if (index >= objectsCount - 2)
-                    return;
-
-                if (_objectDistribution[index] > 1)
-                    _objectDistribution[index]--;
-
-                index++;
-
-                if (totalSize == _objectDistribution.Sum())
-                    return;
-
-                DecreaseDistribution(index);
-            }
+            _objectDistribution[objectsCount - 1] = Math.Max(1, remaining);
 
             return this;
         }
@@ -151,41 +121,18 @@ namespace LibUR.Pooling.Auxiliary
             return this;
         }
 
-        public IPoolCreationData<T> Build()
+        public PoolCreationData<T> Build()
         {
-            return new PoolCreationData(_name, _size, _parent, _onCreate, _onEnable, _increment, _objectDistribution);
-        }
-
-        /// <summary>
-        /// Private nested class implementing IPoolCreationData. Only accessible from within PoolCreationDataBuilder.
-        /// </summary>
-        private class PoolCreationData : IPoolCreationData<T>
-        {
-            public string PoolName { get; private set; }
-            public int Size { get; private set; }
-            public int Increment { get; private set; }
-            public Transform ParentContainer { get; private set; }
-            public Action<T, int> InitializeAction { get; private set; }
-            public Action<T> EnableAction { get; private set; }
-            public int[] ObjectDistribution { get; private set; }
-
-            public PoolCreationData(
-                string name,
-                int size,
-                Transform parent,
-                Action<T, int> onInit = null,
-                Action<T> onEnable = null,
-                int increment = 0,
-                int[] objectDistribution = null)
+            return new PoolCreationData<T>
             {
-                PoolName = name;
-                Size = size;
-                Increment = increment;
-                ParentContainer = parent;
-                InitializeAction = onInit;
-                EnableAction = onEnable;
-                ObjectDistribution = objectDistribution ?? Array.Empty<int>();
-            }
+                PoolName = _name,
+                Size = _size,
+                Increment = _increment,
+                ParentContainer = _parent,
+                InitializeAction = _onCreate,
+                EnableAction = _onEnable,
+                ObjectDistribution = _objectDistribution ?? Array.Empty<int>()
+            };
         }
     }
 }

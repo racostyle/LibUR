@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace LibUR.Auxiliary
+namespace Assets.LibUR.Auxiliary
 {
     /// <summary>Result of a raycast: whether something was hit and hit details.</summary>
     public struct RayCastInfo
@@ -19,7 +19,7 @@ namespace LibUR.Auxiliary
     public class RayCaster
     {
         /// <summary>Default debug draw length when max distance is unlimited (-1).</summary>
-        private const float DefaultDebugDrawDistance = 100f;
+        private const float DefaultDebugDrawDistance = 40f;
 
         private readonly string[] _tags;
 
@@ -64,7 +64,7 @@ namespace LibUR.Auxiliary
         public RayCastInfo SimpleRayDebug(Vector3 originPosition, Vector3 direction, int maxDistance = -1)
         {
             var ray = new Ray(originPosition, direction);
-            float debugDrawLength = maxDistance >= 0 ? maxDistance : DefaultDebugDrawDistance;
+            float debugDrawLength = maxDistance > 0 ? maxDistance : DefaultDebugDrawDistance;
 
             if (!Physics.Raycast(ray, out var hitInfo))
             {
@@ -80,7 +80,7 @@ namespace LibUR.Auxiliary
                 return new RayCastInfo { DidHit = false };
             }
 
-            Debug.DrawLine(ray.origin, hitInfo.point, Color.green);
+            Debug.DrawLine(ray.origin, ray.origin + ray.direction * debugDrawLength, Color.green);
 
             return new RayCastInfo
             {
